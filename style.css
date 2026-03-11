@@ -98,6 +98,7 @@ body {
 .pokemon-main-img {
   width: 100%;
   max-width: 480px;
+  min-height: 335px;
   filter: drop-shadow(0 25px 35px rgba(0, 0, 0, 0.3));
   z-index: 2;
 }
@@ -204,7 +205,20 @@ body {
 }
 
 @media (max-width: 720px) {
+  body {
+    height: 100%;
+    overflow-y: auto;
+  }
+
   .bg-text-large {
     display: none;
+  }
+
+  .card-wrapper {
+    width: 100vw;
+  }
+
+  .data-side {
+    padding-top: 40px;
   }
 }
