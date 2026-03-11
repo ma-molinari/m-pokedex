@@ -1,0 +1,143 @@
+# Pokedex - Cursor Rules
+
+> Regras de contexto otimizadas para Agents e Spec Driven Development.
+> Máximo: 500 linhas.
+
+---
+
+## 1. Identidade do Projeto
+
+- **App**: Pokedex digital para visualizar Pokémon via PokeAPI.
+- **Stack**: React 19, TypeScript, Vite, TanStack Query, Tailwind CSS, Framer Motion, Vitest.
+- **Padrões**: Componentes funcionais, Context API para estado global, hooks customizados para data fetching.
+
+---
+
+## 2. Guia de Contexto - Quando Ler Cada Arquivo em `docs/`
+
+Use esta seção para decidir qual documento carregar como contexto antes de implementar ou responder.
+
+| Arquivo | Quando Ler |
+|---------|------------|
+| `docs/00_project_overview.md` | Visão geral, onboarding, decisões de escopo, features principais. |
+| `docs/01_tech_stack.md` | Escolha de libs, integração de novas dependências, padrões de API, testes. |
+| `docs/02_project_structure.md` | Onde criar arquivos, estrutura de pastas, convenções de organização. |
+| `docs/03_data_flow.md` | Alterar fluxo de dados, SearchStore, hooks de fetching, camada de serviço. |
+| `docs/04_component_library.md` | Criar ou modificar componentes, PokedexCard, sub-componentes, App.tsx. |
+| `docs/05_tooling_and_scripts.md` | Scripts npm, configuração Vite/Tailwind/Vitest, CI/CD. |
+
+### Regras de Uso
+
+- **Spec Driven**: Antes de implementar uma spec, carregue `00`, `01`, `02` e, se relevante, `03` ou `04`.
+- **Agents**: Para tarefas de UI → `00`, `02`, `04`. Para dados/API → `00`, `02`, `03`. Para infra → `01`, `02`, `05`.
+- **Bug fix em componente**: `04` + `03` se envolver estado/dados.
+
+---
+
+## 3. Estrutura do Projeto (Resumo)
+
+```
+src/
+├── components/     # Componentes React (PokedexCard e sub-componentes)
+├── entities/       # Interfaces e tipos (Pokemon, PokemonSpecies)
+├── hooks/          # usePokemon, usePokemonSpecies, usePokedexCard
+├── services/       # pokemonService (Axios → PokeAPI)
+├── stores/         # SearchStore (Context API, currentId)
+├── test/           # Setup, MSW mocks, testes
+└── utils/          # colors, formatters, helpers
+```
+
+---
+
+## 4. Padrões de Código
+
+### TypeScript
+
+- Interfaces em `src/entities/`.
+- Tipagem explícita em funções e retornos de API.
+- Evitar `any`.
+
+### React
+
+- Componentes funcionais.
+- Hooks customizados para lógica reutilizável.
+- Context apenas quando necessário (ex.: SearchStore, PokedexCardContext).
+
+### Estilização
+
+- Tailwind CSS utility-first.
+- Cores de tipos customizadas em `tailwind.config.js`.
+- Framer Motion para animações.
+
+### Data Fetching
+
+- TanStack Query via hooks (`usePokemon`, `usePokemonSpecies`).
+- Serviços em `src/services/` (axios → PokeAPI).
+- Não buscar dados diretamente em componentes; usar hooks.
+
+---
+
+## 5. Fluxo de Dados (Resumo)
+
+```
+Usuário → Navegação → SearchStore.next/prev
+  → App (usePokemon, usePokemonSpecies)
+  → pokemonService → PokeAPI
+  → TanStack Query (cache) → PokedexCard → UI
+```
+
+- `SearchStore`: gerencia `currentId`.
+- `App`: consome estado e dispara fetching.
+- Hooks encapsulam `useQuery`.
+
+---
+
+## 6. Componentes Principais
+
+- **App.tsx**: Orquestrador, efeitos globais (cor de fundo, teclado), composição.
+- **PokedexCard**: Container, PokedexCardContext, sub-componentes.
+  - `VisualSide`, `DataSide`, `BackgroundText`, `GenerationTag`, `Image`.
+- Use `usePokedexCard()` dentro dos filhos do PokedexCard.
+
+---
+
+## 7. Testes
+
+- Vitest + React Testing Library + JSDOM + MSW.
+- Setup em `src/test/`.
+- Mocks de API em `src/test/msw/`.
+- Rodar: `npm run test`.
+
+---
+
+## 8. Scripts
+
+- `npm run dev` → Vite dev server.
+- `npm run build` → Build produção.
+- `npm run test` → Vitest.
+
+---
+
+## 9. Convenções para Agents
+
+1. **Antes de editar**: Verificar seção "Guia de Contexto" e carregar docs relevantes.
+2. **Novos componentes**: Criar em `src/components/`, seguir estrutura do PokedexCard se for complexo.
+3. **Novos serviços**: `src/services/`, tipar retorno com `entities`.
+4. **Novos hooks**: `src/hooks/`, preferir TanStack Query para fetching.
+5. **Cores/Tailwind**: Usar paleta de tipos em `tailwind.config.js` quando fizer sentido.
+6. **Testes**: Incluir testes para componentes e hooks relevantes; usar MSW para API.
+7. **Imports**: Preferir caminhos relativos e imports explícitos (evitar barrels desnecessários).
+
+---
+
+## 10. Referência Rápida de Arquivos
+
+| Padrão | Localização |
+|--------|-------------|
+| Tipos Pokemon | `src/entities/` |
+| API PokeAPI | `src/services/pokemonService.ts` |
+| Estado global ID | `src/stores/SearchStore.tsx` |
+| Hooks de dados | `src/hooks/` |
+| Componente principal | `src/components/PokedexCard/` |
+| Setup testes | `src/test/setup.ts` |
+| Config Tailwind | `tailwind.config.js` |
