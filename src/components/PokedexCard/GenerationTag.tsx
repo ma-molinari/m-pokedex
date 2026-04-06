@@ -1,12 +1,15 @@
 import { usePokedexCard } from "./index";
 
 export const GenerationTag = () => {
-  const { pokemonSpecies } = usePokedexCard();
+  const { pokemonSpecies, speciesAligned } = usePokedexCard();
 
-  if (!pokemonSpecies) {
+  if (!pokemonSpecies || !speciesAligned) {
     return (
       <span className="generation-tag">
-        Gen: <span id="p-region">...</span>
+        Gen:{" "}
+        <span id="p-region" className="generation-tag__pending">
+          …
+        </span>
       </span>
     );
   }

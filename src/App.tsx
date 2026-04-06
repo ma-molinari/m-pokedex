@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from "react";
+import { motion } from "framer-motion";
 import { PokedexCard } from "./components/PokedexCard";
 import { VisualSide } from "./components/PokedexCard/VisualSide";
 import { DataSide } from "./components/PokedexCard/DataSide";
@@ -9,24 +10,32 @@ import { usePokemonSpecies } from "./hooks/usePokemonSpecies";
 import { pokemonTypeColors } from "./utils/colors";
 import { usePreloadImages } from "./hooks/usePreloadImages";
 import { getOfficialArtworkUrl } from "./utils/sprites";
+import { formatId } from "./utils/formatters";
 
 function App() {
   const { currentId, next, prev } = useSearch();
   const {
     data: pokemon,
     isLoading: isLoadingPokemon,
+    isFetching: isFetchingPokemon,
     isError: isErrorPokemon,
     refetch: refetchPokemon,
   } = usePokemon(String(currentId));
   const {
     data: pokemonSpecies,
     isLoading: isLoadingSpecies,
+    isFetching: isFetchingSpecies,
     isError: isErrorSpecies,
     refetch: refetchSpecies,
   } = usePokemonSpecies(String(currentId));
 
   const isLoading = isLoadingPokemon || isLoadingSpecies;
+  const isFetching = isFetchingPokemon || isFetchingSpecies;
   const isError = isErrorPokemon || isErrorSpecies;
+
+  const speciesAligned = Boolean(
+    pokemon && pokemonSpecies && pokemon.id === pokemonSpecies.id,
+  );
 
   const handleRetry = () => {
     refetchPokemon();
@@ -75,10 +84,22 @@ function App() {
 
   return (
     <>
-      <button className="nav-btn prev" onClick={prev} aria-label="Anterior">
+      <button
+        type="button"
+        className={`nav-btn prev${isFetching ? " nav-btn--fetching" : ""}`}
+        onClick={prev}
+        aria-label="Anterior"
+        aria-busy={isFetching}
+      >
         &#10094;
       </button>
-      <button className="nav-btn next" onClick={next} aria-label="Próximo">
+      <button
+        type="button"
+        className={`nav-btn next${isFetching ? " nav-btn--fetching" : ""}`}
+        onClick={next}
+        aria-label="Próximo"
+        aria-busy={isFetching}
+      >
         &#10095;
       </button>
 
@@ -87,13 +108,34 @@ function App() {
         pokemonSpecies={pokemonSpecies}
         isLoading={isLoading}
         isError={isError}
+        isFetching={isFetching}
+        speciesAligned={speciesAligned}
         onRetry={handleRetry}
       >
-        <main className="card-wrapper animate" id="content">
+        <motion.main
+          id="content"
+          className="card-wrapper animate"
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.15}
+          aria-busy={isLoading || (isFetching && !speciesAligned)}
+          onDragEnd={(_, info) => {
+            if (info.offset.x < -50) {
+              next();
+            } else if (info.offset.x > 50) {
+              prev();
+            }
+          }}
+        >
+          {pokemon && speciesAligned ? (
+            <span className="sr-only" aria-live="polite" aria-atomic="true">
+              {pokemon.name}, número {formatId(pokemon.id)}
+            </span>
+          ) : null}
           <BackgroundText />
           <VisualSide />
           <DataSide />
-        </main>
+        </motion.main>
       </PokedexCard>
     </>
   );

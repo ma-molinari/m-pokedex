@@ -6,6 +6,10 @@ interface PokedexCardContextType {
   pokemonSpecies: PokemonSpecies | undefined;
   isLoading: boolean;
   isError: boolean;
+  /** True while either query is in flight (initial or refetch). */
+  isFetching: boolean;
+  /** Pokémon and species payloads refer to the same species (avoids mixed stale rows). */
+  speciesAligned: boolean;
   onRetry?: () => void;
 }
 
@@ -19,6 +23,8 @@ interface PokedexCardProps {
   pokemonSpecies: PokemonSpecies | undefined;
   isLoading: boolean;
   isError: boolean;
+  isFetching: boolean;
+  speciesAligned: boolean;
   onRetry?: () => void;
 }
 
@@ -28,11 +34,21 @@ export const PokedexCard = ({
   pokemonSpecies,
   isLoading,
   isError,
+  isFetching,
+  speciesAligned,
   onRetry,
 }: PokedexCardProps) => {
   return (
     <PokedexCardContext.Provider
-      value={{ pokemon, pokemonSpecies, isLoading, isError, onRetry }}
+      value={{
+        pokemon,
+        pokemonSpecies,
+        isLoading,
+        isError,
+        isFetching,
+        speciesAligned,
+        onRetry,
+      }}
     >
       {isError ? (
         <main className="card-wrapper animate" id="content">
