@@ -24,6 +24,7 @@ const mockPokemon = {
 };
 
 const mockPokemonSpecies = {
+  id: 1,
   generation: { name: 'generation-i' },
   names: [
     { name: 'Bulbasaur', language: { name: 'en' } },
