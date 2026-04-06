@@ -1,7 +1,11 @@
+---
+description: Contexto do projeto Pokedex — identidade, stack, padrões de código, estrutura e convenções para Agents.
+alwaysApply: true
+---
+
 # Pokedex - Cursor Rules
 
 > Regras de contexto otimizadas para Agents e Spec Driven Development.
-> Máximo: 500 linhas.
 
 ---
 
